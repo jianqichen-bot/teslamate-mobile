@@ -1,0 +1,29 @@
+{
+  "name": "teslamate-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "teslamate-server",
+    "teslamate-app"
+  ],
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "scripts": {
+    "app:start": "npm run start --workspace teslamate-app",
+    "app:android": "npm run android --workspace teslamate-app",
+    "app:ios": "npm run ios --workspace teslamate-app",
+    "app:web": "npm run web --workspace teslamate-app",
+    "app:typecheck": "npm run typecheck --workspace teslamate-app",
+    "server:dev": "npm run dev --workspace teslamate-server",
+    "server:build": "npm run build --workspace teslamate-server",
+    "server:start": "npm run start --workspace teslamate-server"
+  }
+}

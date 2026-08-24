@@ -1,0 +1,21 @@
+node_modules/
+dist/
+coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Mobile tooling
+.expo/
+.metro-health-check*
+android/.gradle/
+android/app/build/
+ios/Pods/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+*.log
