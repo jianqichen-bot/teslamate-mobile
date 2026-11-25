@@ -13,9 +13,11 @@ FROM node:20-alpine AS runtime
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 
 COPY package.json ./
 COPY --from=build /app/dist ./dist
+RUN npm install --omit=dev
 
 EXPOSE 3000
 

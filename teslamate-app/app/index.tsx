@@ -1,36 +1,57 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useServerHealth } from "../hooks/useServerHealth";
+import { apiUrl } from "../services/api";
+import { useCars } from "../hooks/useCars";
+import { CarCard } from "../components/CarCard";
 
 export default function HomeScreen() {
+  const { state, retry } = useServerHealth();
+  const { state: carsState, refresh } = useCars();
+  const loading = state.status === "loading" || carsState.status === "loading";
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.eyebrow}>TESLAMATE MOBILE</Text>
         <Text style={styles.title}>车辆数据，随时掌握</Text>
         <Text style={styles.description}>
-          React Native 客户端已经就绪。下一步将连接 TeslaMate Server，展示车辆状态与行程数据。
+          查看 TeslaMate 最近记录的车辆数据。采集时间可能存在延迟，以下并非实时状态。
         </Text>
 
         <View style={styles.card}>
-          <View style={styles.statusDot} />
-          <View>
-            <Text style={styles.cardLabel}>应用状态</Text>
-            <Text style={styles.cardValue}>移动端工程运行正常</Text>
+          <View style={[styles.statusDot, { backgroundColor: state.status === "connected" ? "#44D07B" : state.status === "error" ? "#E82127" : "#E5B95C" }]} />
+          <View style={{ flex: 1 }} accessibilityLiveRegion="polite">
+            <Text style={styles.cardLabel}>服务端连接</Text>
+            <Text style={styles.cardValue}>{state.status === "loading" ? "正在连接…" : state.status === "connected" ? "已连接 TeslaMate Server" : "连接失败"}</Text>
           </View>
         </View>
-      </View>
+        <Text style={styles.endpoint} selectable>{apiUrl}</Text>
+        {state.status === "error" && <Text style={styles.error}>{state.message}</Text>}
+        <View accessibilityLiveRegion="polite">
+          {carsState.status === "loading" && <Text style={styles.endpoint}>正在读取车辆…</Text>}
+          {carsState.status === "error" && <Text style={styles.error}>{carsState.message}</Text>}
+          {carsState.status === "ready" && carsState.cars.length === 0 && <Text style={styles.description}>还没有车辆，请先在 TeslaMate 中添加车辆。</Text>}
+        </View>
+        {carsState.status === "ready" && carsState.cars.map((car) => <CarCard key={car.id} car={car} />)}
+        <Pressable accessibilityRole="button" disabled={loading} onPress={() => { retry(); refresh(); }} style={[styles.button, loading && { opacity: 0.5 }]}>
+          <Text style={styles.cardValue}>{loading ? "正在刷新…" : "刷新数据"}</Text>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  endpoint: { color: "#7D828C", fontSize: 12, marginTop: 12 },
+  error: { color: "#FF777C", fontSize: 14, marginTop: 12 },
+  button: { alignItems: "center", backgroundColor: "#25282E", borderRadius: 12, marginTop: 20, padding: 14 },
   safeArea: {
     flex: 1,
     backgroundColor: "#0A0B0D",
   },
   container: {
-    flex: 1,
-    justifyContent: "center",
+    flexGrow: 1,
+    paddingVertical: 36,
     paddingHorizontal: 28,
   },
   eyebrow: {
